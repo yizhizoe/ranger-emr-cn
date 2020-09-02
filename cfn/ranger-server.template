@@ -1,0 +1,204 @@
+Description: Sample CloudFormation template for creating a ranger server
+Parameters:
+  VPC:
+    Description: VPC ID for creating the Ranger Server
+    Type: AWS::EC2::VPC::Id
+  VPCCidrBlock:
+    AllowedPattern: '((\d{1,3})\.){3}\d{1,3}/\d{1,2}'
+    Default: 0.0.0.0/0
+    Description: VPC CIDR Block (eg 10.0.0.0/16)
+    Type: String
+  Subnet:
+    Description: Subnet ID for creating the Ranger Server
+    Type: AWS::EC2::Subnet::Id
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH to the instances
+    Type: AWS::EC2::KeyPair::KeyName
+  InstanceType:
+    Description: Instance type of the Ranger Server
+    Type: String
+    Default: t3.large
+    AllowedValues:
+      - t3.large
+      - t3.xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - r5.large
+      - r5.xlarge
+    ConstraintDescription: must be a valid EC2 instance type.
+  myDirectoryIPAddress:
+    Description: IP Address of the Windows AD server
+    Type: String
+    Default: 52.83.16.206
+  myDirectoryBaseDN:
+    Description: Base DN of Windwos AD server
+    Type: String
+    Default: dc=uclek,dc=com
+  myDirectoryAdminPassword:
+    Description: Admin Password used to setup Windwos AD server
+    Type: String
+    Default: Aws@1234
+    NoEcho: true
+  myDirectoryBindUser:
+    Description: BindUser Windwos AD server
+    Type: String
+    Default: binduser@uclek.com
+  myDirectoryBindPassword:
+    Description: BindPassword Windwos AD server
+    Type: String
+    Default: Aws@1234
+    NoEcho: true
+  myDirectoryDefaultUserPassword:
+    Description: Default Password for all users created in the Windwos AD server
+    Type: String
+    Default: Aws@1234
+    NoEcho: true
+  rangerVersion:
+    Description: RangerVersion
+    Type: String
+    Default: '2.0'
+    AllowedValues:
+      - '1.0'
+      - '2.0'
+  s3Bucket:
+    Default: s3://emr-ranger-workshop
+    Description: S3 bucket to download ranger installation artifacts
+    Type: String
+Mappings:
+  AWSInstanceType2Arch:
+    t3.large:
+      Arch: HVM64
+    t3.xlarge:
+      Arch: HVM64
+    m5.large:
+      Arch: HVM64
+    m5.xlarge:
+      Arch: HVM64
+    m5.2xlarge:
+      Arch: HVM64
+    c5.large:
+      Arch: HVM64
+    c5.xlarge:
+      Arch: HVM64
+    c5.2xlarge:
+      Arch: HVM64
+    r5.large:
+      Arch: HVM64
+    r5.xlarge:
+      Arch: HVM64
+  AWSRegionArch2AMI:
+    us-east-1:
+      HVM64: ami-0915e09cc7ceee3ab
+    us-east-2:
+      HVM64: ami-097834fcb3081f51a
+    us-west-2:
+      HVM64: ami-01f08ef3e76b957e5
+    us-west-1:
+      HVM64: ami-014743cb7690ea737
+    eu-west-1:
+      HVM64: ami-00890f614e48ce866
+    eu-central-1:
+      HVM64: ami-03ab4e8f1d88ce614
+    ap-northeast-1:
+      HVM64: ami-0318ecd6d05daa212
+    ap-northeast-2:
+      HVM64: ami-09391a0ad9f9243b6
+    ap-southeast-1:
+      HVM64: ami-0dff4318d85149d5d
+    ap-southeast-2:
+      HVM64: ami-050e1ec030abb8dde
+    sa-east-1:
+      HVM64: ami-03e1e4abf50e14ded
+    cn-northwest-1:
+      HVM64: ami-0e21949a0d60b93e2
+    cn-north-1:
+      HVM64: ami-070bbaf63a64f1ddc
+Resources:
+  sgRangerAdminServer:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Open Up all Ranger Server ports
+      VpcId: !Ref 'VPC'
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '6080'
+          ToPort: '6080'
+          CidrIp: !Ref VPCCidrBlock
+        - IpProtocol: tcp
+          FromPort: '8983'
+          ToPort: '8983'
+          CidrIp: !Ref VPCCidrBlock
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: !Ref VPCCidrBlock
+  rangerEC2:
+    Type: AWS::EC2::Instance
+    Metadata:
+      AWS::CloudFormation::Init:
+        configSets:
+          InstallRangerServer:
+            - RangerServer
+        RangerServer:
+          commands:
+            installrangerserver:
+              command: !Join
+                - ''
+                - - 'bash /tmp/install-ranger-admin-server.sh '
+                  - !Ref 'myDirectoryIPAddress'
+                  - ' '
+                  - !Ref 'myDirectoryBaseDN'
+                  - ' '
+                  - !Ref 'myDirectoryBindUser'
+                  - ' '
+                  - !Ref 'myDirectoryBindPassword'
+                  - ' '
+                  - !Ref 'rangerVersion'
+                  - ' '
+                  - !Ref 's3Bucket'
+                  - ' '
+                  - !Ref 'myDirectoryAdminPassword'
+                  - ' '
+                  - !Ref 'myDirectoryDefaultUserPassword'
+                  - " > create-ranger-server-output.log \n"
+    Properties:
+      SubnetId: !Ref 'Subnet'
+      SecurityGroupIds:
+        - !Ref 'sgRangerAdminServer'
+      ImageId: !FindInMap
+        - AWSRegionArch2AMI
+        - !Ref 'AWS::Region'
+        - !FindInMap
+          - AWSInstanceType2Arch
+          - !Ref 'InstanceType'
+          - Arch
+      InstanceType: !Ref 'InstanceType'
+      IamInstanceProfile: 'EC2-S3'
+      KeyName: !Ref 'KeyName'
+      UserData: !Base64
+        Fn::Join:
+          - ''
+          - - "#!/bin/bash\n"
+            - "cd /tmp\n"
+            - "wget https://emr-ranger-workshop.s3.cn-northwest-1.amazonaws.com.cn/scripts/install-ranger-admin-server.sh\n"
+            - "yum update aws-cfn-bootstrap\n"
+            - "# Install the files and packages from the metadata\n"
+            - '/opt/aws/bin/cfn-init '
+            - '         --stack '
+            - !Ref 'AWS::StackName'
+            - '         --resource rangerEC2 '
+            - '         --configsets InstallRangerServer '
+            - '         --region '
+            - !Ref 'AWS::Region'
+            - "\n"
+      Tags:
+        - Key: Name
+          Value: RangerServer
+Outputs:
+  IPAddress:
+    Description: IP address of the Ranger server
+    Value: !GetAtt 'rangerEC2.PrivateIp'
