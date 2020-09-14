@@ -4,7 +4,7 @@ set -x
 # Define variables
 aws_bucket=$1
 installpath=/tmp
-hdfs_data_location=s3://$aws_bucket/inputdata
+hdfs_data_location=$aws_bucket/inputdata
 cd $installpath
 aws s3 cp $hdfs_data_location/football_coach.tsv .
 aws s3 cp $hdfs_data_location/football_coach_position.tsv .

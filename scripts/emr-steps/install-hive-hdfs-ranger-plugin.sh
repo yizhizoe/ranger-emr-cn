@@ -33,9 +33,9 @@ sudo mkdir -p $installpath/hadoop
 sudo chmod -R 777 $installpath
 cd $installpath
 #wget $mysql_jar_location
-aws s3 cp s3://emr-ranger-workshop/ranger/$mysql_jar . --region cn-northwest-1
-aws s3 cp $ranger_s3bucket/$ranger_hdfs_plugin.tar.gz . --region cn-northwest-1
-aws s3 cp $ranger_s3bucket/$ranger_hive_plugin.tar.gz . --region cn-northwest-1
+aws s3 cp $s3bucket/ranger/$mysql_jar . --region cn-north-1
+aws s3 cp $ranger_s3bucket/$ranger_hdfs_plugin.tar.gz . --region cn-north-1
+aws s3 cp $ranger_s3bucket/$ranger_hive_plugin.tar.gz . --region cn-north-1
 mkdir $ranger_hdfs_plugin
 tar -xvf $ranger_hdfs_plugin.tar.gz -C $ranger_hdfs_plugin --strip-components=1
 cd $installpath/$ranger_hdfs_plugin

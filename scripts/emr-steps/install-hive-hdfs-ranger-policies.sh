@@ -15,7 +15,7 @@ sudo rm -rf $installpath
 sudo mkdir -p $installpath
 sudo chmod -R 777 $installpath
 cd $installpath
-aws s3 cp $ranger_policybucket . --recursive --exclude "*" --include "*.json" --region cn-northwest-1
+aws s3 cp $ranger_policybucket . --recursive --exclude "*" --include "*.json" --region cn-north-1
 sudo sed -i "s|emr_masternode|$hdfs_namenode_fqdn|g" ranger-hdfs-repo.json
 sudo sed -i "s|emr_masternode|$hive_server2_fqdn|g" ranger-hive-repo.json
 curl -iv -u admin:admin -d @ranger-hdfs-repo.json -H "Content-Type: application/json" -X POST http://$ranger_server_fqdn:6080/service/public/api/repository/

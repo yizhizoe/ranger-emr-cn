@@ -33,13 +33,13 @@ sudo mkdir -p $installpath/s3
 sudo chmod -R 777 $installpath
 cd $installpath/s3
 #wget $mysql_jar_location
-aws s3 cp $s3bucket/emrfs/emrfs-s3-authz-1.0.jar . --region cn-northwest-1
+aws s3 cp $s3bucket/emrfs/emrfs-s3-authz-1.0.jar . --region cn-north-1
 sudo mkdir -p /usr/share/aws/emr/emrfs/lib/
 sudo mkdir -p /usr/share/aws/emr/emrfs/conf/
 #sudo cp emrfs-hadoop-assembly-2.38.0.jar /usr/share/aws/emr/emrfs/lib/emrfs-hadoop-assembly-2.38.0.jar
 sudo cp emrfs-s3-authz-1.0.jar /usr/share/aws/emr/emrfs/lib/
 
-aws s3 cp $ranger_s3bucket/$ranger_s3_plugin.tar.gz . --region cn-northwest-1
+aws s3 cp $ranger_s3bucket/$ranger_s3_plugin.tar.gz . --region cn-north-1
 sudo mkdir $ranger_s3_plugin
 sudo tar -xvf $ranger_s3_plugin.tar.gz -C $ranger_s3_plugin --strip-components=1
 cd $installpath/s3/$ranger_s3_plugin

@@ -55,6 +55,16 @@
         "Description": "Log Dir for the EMR cluster",
         "Type": "String"
     },
+    "myDirectoryBaseDN": {
+       "Description": "Base DN of Windwos AD server",
+       "Type": "String",
+       "Default": "dc=uclek,dc=com"
+    },
+    "myNTDomain": {
+       "Description": "NT Domain Name",
+       "Type": "String",
+       "Default": "uclek.com"
+    },
     "myDirectoryBindUser": {
       "Description": "BindUser Windows AD server",
       "Type": "String",
@@ -63,7 +73,7 @@
     "myDirectoryBindPassword": {
       "Description": "BindPassword Windows AD server",
       "Type": "String",
-      "Default": "Aws@1234"
+      "Default": "Aws@1234",    
     },
     "LDAPServerIP": {
         "Description": "IP address of the LDAP server",
@@ -152,7 +162,7 @@
                         {
                           "Classification": "ldap",
                           "ConfigurationProperties": {
-                            "base_dn": "dc=uclek,dc=com",
+                            "base_dn": { "Ref" : "myDirectoryBaseDN" },
                             "bind_dn": {
                               "Fn::If" : [
                                 "OlderEmrVersion",
@@ -174,8 +184,17 @@
                                 ]
                               ]
                             },
-                            "ldap_username_pattern": "uid=<username>,cn=users,dc=uclek,dc=com",
-                            "nt_domain": "uclek.com",
+                            "ldap_username_pattern": {
+                                "Fn::Join": [
+                                    ",",
+                                    [
+                                        "uid=<username>",
+                                        "cn=users",
+                                        { "Ref" : "myDirectoryBaseDN"}
+                                    ]
+                                ]
+                            },
+                            "nt_domain": { "Ref" : "myNTDomain"},
                             "search_bind_authentication": "false",
                             "trace_level": "0"
                           },
@@ -216,7 +235,7 @@
                             ]
                         ]
                       },
-                    "hadoop.security.group.mapping.ldap.base": "dc=uclek,dc=com",
+                    "hadoop.security.group.mapping.ldap.base": { "Ref" : "myDirectoryBaseDN" },
                     "hadoop.security.group.mapping.ldap.search.filter.user": "(objectclass=*)",
                     "hadoop.security.group.mapping.ldap.search.filter.group": "(objectclass=*)",
                     "hadoop.security.group.mapping.ldap.search.attr.member": "member",
@@ -306,7 +325,9 @@
                 "HadoopJarStep": {
                     "Args": [
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/createHiveTables.sh",
-                        "emr-ranger-workshop"
+                        {
+                            "Ref": "s3artifactsRepo"
+                        }
                     ],
                     "Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
@@ -373,7 +394,9 @@
                 "HadoopJarStep": {
                     "Args": [
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/loadDataIntoHDFS.sh",
-                        "emr-ranger-workshop"
+                        {
+                            "Ref": "s3artifactsRepo"
+                        }
                     ],
                     "Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
