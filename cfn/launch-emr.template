@@ -58,13 +58,11 @@
     "myDirectoryBindUser": {
       "Description": "BindUser Windows AD server",
       "Type": "String",
-      "AllowedValues" : ["binduser@uclek.com"],
       "Default": "binduser@uclek.com"
     },
     "myDirectoryBindPassword": {
       "Description": "BindPassword Windows AD server",
       "Type": "String",
-      "AllowedValues" : ["Aws@1234"],
       "Default": "Aws@1234"
     },
     "LDAPServerIP": {
@@ -310,7 +308,7 @@
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/createHiveTables.sh",
                         "emr-ranger-workshop"
                     ],
-                    "Jar": "s3://cn-northwest-1.elasticmapreduce/libs/script-runner/script-runner.jar",
+                    "Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
                 },
                 "JobFlowId": {
@@ -336,7 +334,7 @@
                             "Ref": "s3artifactsRepo"
                         }
                     ],
-                    "Jar": "s3://cn-northwest-1.elasticmapreduce/libs/script-runner/script-runner.jar",
+                    "Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
                 },
                 "JobFlowId": {
@@ -359,7 +357,7 @@
                             "Fn::Join": ["", [{ "Ref": "s3artifactsRepo"}, "/inputdata"]]
                         }
                     ],
-                    "Jar": "s3://cn-northwest-1.elasticmapreduce/libs/script-runner/script-runner.jar",
+                    "Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
                 },
                 "JobFlowId": {
@@ -377,7 +375,7 @@
                         "/mnt/tmp/aws-blog-emr-ranger/scripts/emr-steps/loadDataIntoHDFS.sh",
                         "emr-ranger-workshop"
                     ],
-                    "Jar": "s3://cn-northwest-1.elasticmapreduce/libs/script-runner/script-runner.jar",
+                    "Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",
                     "MainClass": ""
                 },
                 "JobFlowId": {

@@ -184,7 +184,7 @@ Resources:
           - ''
           - - "#!/bin/bash\n"
             - "cd /tmp\n"
-            - "wget https://emr-ranger-workshop.s3.cn-northwest-1.amazonaws.com.cn/scripts/install-ranger-admin-server.sh\n"
+            - "wget https://zoe-emr-ranger.s3.cn-north-1.amazonaws.com.cn/scripts/install-ranger-admin-server.sh\n"
             - "yum update aws-cfn-bootstrap\n"
             - "# Install the files and packages from the metadata\n"
             - '/opt/aws/bin/cfn-init '

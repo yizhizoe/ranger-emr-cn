@@ -58,10 +58,10 @@ mysql -u root -prangeradmin -e "FLUSH PRIVILEGES;" || true
 sudo rm -rf $installpath
 sudo mkdir -p $installpath/hadoop
 cd $installpath
-aws s3 cp $ranger_s3bucket/$ranger_admin_server.tar.gz . --region cn-northwest-1
-aws s3 cp $ranger_s3bucket/$ranger_user_sync.tar.gz . --region cn-northwest-1
-aws s3 cp  $mysql_jar_location . --region cn-northwest-1
-aws s3 cp  $ranger_s3bucket/solr_for_audit_setup.tar.gz . --region cn-northwest-1
+aws s3 cp $ranger_s3bucket/$ranger_admin_server.tar.gz . --region cn-north-1
+aws s3 cp $ranger_s3bucket/$ranger_user_sync.tar.gz . --region cn-north-1
+aws s3 cp  $mysql_jar_location . --region cn-north-1
+aws s3 cp  $ranger_s3bucket/solr_for_audit_setup.tar.gz . --region cn-north-1
 #Update ranger admin install.properties
 tar -xvf $ranger_admin_server.tar.gz
 cd $ranger_admin_server
@@ -145,8 +145,8 @@ sudo /usr/bin/ranger-usersync stop || true
 sudo /usr/bin/ranger-usersync start
 cd $installpath
 # Install S3 service defination
-aws s3 cp $s3bucket/inputdata/ranger-servicedef-s3.json . --region cn-northwest-1
-aws s3 cp $s3bucket/inputdata/ranger-s3-repo.json . --region cn-northwest-1
+aws s3 cp $s3bucket/inputdata/ranger-servicedef-s3.json . --region cn-north-1
+aws s3 cp $s3bucket/inputdata/ranger-s3-repo.json . --region cn-north-1
 curl -u admin:admin -X DELETE http://localhost:6080/service/public/v2/api/servicedef/name/awss3
 curl -u admin:admin -X POST -H "Accept: application/json" -H "Content-Type: application/json" http://localhost:6080/service/public/v2/api/servicedef -d @ranger-servicedef-s3.json
 curl -iv -u admin:admin -d @ranger-s3-repo.json -H "Content-Type: application/json" -X POST http://localhost:6080/service/public/v2/api/service/
