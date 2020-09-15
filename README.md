@@ -42,15 +42,15 @@ aws s3 ls s3://<bucket_name>/
 
 #### 2. 创建Windows AD服务器：
 
-Windows Sever2012/16使用create_win_ad.template模板创建
+Windows Sever2012/16使用**create_win_ad.template**模板创建
 
 #### 3.创建Ranger服务器：
 
-Amazon Linux2，Ranger 2.0版本 ， 使用ranger-server.template模板创建
+Amazon Linux2，Ranger 2.0版本 ， 使用**ranger-server.template**模板创建
 
 #### 4.创建EMR集群和AWS Glue：
 
-EMR 5.29/5.30版本，包括Hadoop，Hue，Hive，Spark等组件 ，使用 launch-emr.template创建
+EMR 5.29/5.30版本，包括Hadoop，Hue，Hive，Spark等组件 ，使用**launch-emr.template**创建
 
 ## 详细步骤&注意事项说明
 
@@ -58,8 +58,8 @@ EMR 5.29/5.30版本，包括Hadoop，Hue，Hive，Spark等组件 ，使用 launc
 
 - AD服务器绑定EIP，防止IP地址因为机器重启而变化，后面创建Ranger和EMR集群时需要和AD服务器通讯
 - 北京区选择AMI: ami-09c7bab48bbc956ef
-- 创建一个binduser域账户，具有administrator权限，这是用于将windows ad和ranger打通的用户（也可以直接用administrator用户，但不建议）
-- 创建Hadoop Admin，Hadoop Analyst两个用户组，然后在Hadoop Admin用户组下创建admin1用户，在Hadoop Analyst用户组下创建analyst1，analyst2域用户，这些用户会同步到ranger用户中，并且在inputdata文件夹中有这些用户的权限管理文件（已经hard code了）。如果用了其他的用户名，需将inputdata文件夹中的权限文件也做相应修改。
+- 创建一个binduser域账户，具有administrator权限，这是用于将Windows AD和Ranger打通的用户（也可以直接用administrator用户，但不建议）
+- **创建Hadoop Admin，Hadoop Analyst两个用户组，然后在Hadoop Admin用户组下创建admin1用户，在Hadoop Analyst用户组下创建analyst1，analyst2域用户**，这些用户会同步到ranger用户中，并且在inputdata文件夹中有这些用户的权限管理文件（已经hard code了）。如果用了其他的用户名，需将inputdata文件夹中的权限文件也做相应修改。
 
 #### Ranger 服务器
 
@@ -72,8 +72,8 @@ EMR 5.29/5.30版本，包括Hadoop，Hue，Hive，Spark等组件 ，使用 launc
 
 - 将cloudformation模板中的s3artifactsRepo替换成存放自己安装文件和脚本的s3 bucket
 - 将EMRLog dir更换成自己的s3 log 地址
-- 默认用的是北京区域，cloudformation模板中EMR step中"Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",用的是cn-northwest-1.（ZHY直接替换成cn-northwest-1）
+- 默认用的是北京区域，cloudformation模板中EMR step中"Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar"（ZHY可直接替换成cn-northwest-1）
 - 集群创建好之后可以用域用户直接登录到Hue界面中如下图，analyst2只有访问tblanalyst2的权限
   - ![image-20200915182552407](image/image-20200915182552407.png)
-- 不同域用户的Hive或HDFS权限管理在ranger中如下图
+- 不同域用户的Hive或HDFS权限管理在Ranger中如下图
   - ![image-20200915182704717](image/image-20200915182704717.png)
