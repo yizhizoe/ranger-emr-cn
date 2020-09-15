@@ -73,8 +73,7 @@ EMR 5.29/5.30版本，包括Hadoop，Hue，Hive，Spark等组件 ，使用 launc
 - 将cloudformation模板中的s3artifactsRepo替换成存放自己安装文件和脚本的s3 bucket
 - 将EMRLog dir更换成自己的s3 log 地址
 - 默认用的是北京区域，cloudformation模板中EMR step中"Jar": "s3://cn-north-1.elasticmapreduce/libs/script-runner/script-runner.jar",用的是cn-northwest-1.（ZHY直接替换成cn-northwest-1）
-- 集群创建好之后可以用域用户直接登录到Hue界面中如下图，analyst1只有访问tblanalyst1的权限
-- ![image-20200915181418060](image/image-20200915181418060.png)
-
+- 集群创建好之后可以用域用户直接登录到Hue界面中如下图，analyst2只有访问tblanalyst2的权限
+  - ![image-20200915182552407](image/image-20200915182552407.png)
 - 不同域用户的Hive或HDFS权限管理在ranger中如下图
-- ![image-20200915181522152](image/image-20200915181522152.png)
+  - ![image-20200915182704717](image/image-20200915182704717.png)
