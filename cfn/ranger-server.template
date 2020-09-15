@@ -33,7 +33,7 @@ Parameters:
   myDirectoryIPAddress:
     Description: IP Address of the Windows AD server
     Type: String
-    Default: 52.83.16.206
+    Default: 172.31.100.40
   myDirectoryBaseDN:
     Description: Base DN of Windwos AD server
     Type: String
@@ -118,6 +118,33 @@ Mappings:
     cn-north-1:
       HVM64: ami-070bbaf63a64f1ddc
 Resources:
+  RangerEC2Role:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - ec2.amazonaws.com.cn
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: AccessRangerS3
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 's3:*'
+                Resource: '*'
+  RangerInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      Roles:
+        - !Ref RangerEC2Role
   sgRangerAdminServer:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -177,14 +204,18 @@ Resources:
           - !Ref 'InstanceType'
           - Arch
       InstanceType: !Ref 'InstanceType'
-      IamInstanceProfile: 'EC2-S3'
+      IamInstanceProfile: !Ref RangerInstanceProfile
       KeyName: !Ref 'KeyName'
       UserData: !Base64
         Fn::Join:
           - ''
           - - "#!/bin/bash\n"
             - "cd /tmp\n"
-            - "wget https://zoe-emr-ranger.s3.cn-north-1.amazonaws.com.cn/scripts/install-ranger-admin-server.sh\n"
+            - "aws s3 cp "
+            - !Ref 's3Bucket' 
+            - "/scripts/install-ranger-admin-server.sh . --region "
+            - !Ref 'AWS::Region'
+            - "\n"
             - "yum update aws-cfn-bootstrap\n"
             - "# Install the files and packages from the metadata\n"
             - '/opt/aws/bin/cfn-init '
